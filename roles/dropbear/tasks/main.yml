@@ -1,0 +1,46 @@
+- block:
+  - name: Define variables within the task file
+    set_fact:
+      update_initramfs: false
+
+  - name: Gather package facts
+    package_facts:
+      manager: apt
+    no_log: true
+
+  - name: Install dropbear-initramfs if absent
+    apt:
+      name: dropbear-initramfs
+      state: present
+    when: '"dropbear-initramfs" not in ansible_facts.packages'
+
+  - name: Create dropbear config file
+    copy:
+      src: ../templates/dropbear.conf
+      dest: /etc/dropbear/initramfs/dropbear.conf
+      owner: root
+      mode: '0600'
+
+  - name: Create initramfs config file
+    template:
+      src: ../templates/initramfs.conf.j2
+      dest: /etc/initramfs-tools/initramfs.conf
+      owner: root
+      mode: '0600'
+
+  - name: Update initramfs
+    command: update-initramfs -u
+    when: update_initramfs
+
+  - name: Create dropbear authorized_keys file with public keys
+    copy:
+      dest: /etc/dropbear/initramfs/authorized_keys
+      content: |
+        {% for key in authorized_keys %}
+        {{ key }}
+        {% endfor %}
+      owner: root
+      group: root
+      mode: '0600'
+
+  become: true

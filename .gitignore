@@ -1,0 +1,6 @@
+/.idea
+
+*.retry
+
+/hosts
+/group_vars/secrets.yml

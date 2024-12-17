@@ -1,0 +1,22 @@
+- block:
+  - name: Add service user for portainer
+    user:
+      name: "{{ portainer_service_user }}"
+      groups: "{{ service_group }}"
+      state: present
+
+  - name: Copy Portainer docker compose file
+    template:
+      src: ../templates/docker-compose.yml.j2
+      dest: "{{ portainer_home_directory }}/docker-compose.yml"
+      owner: "{{ portainer_service_user }}"
+      group: "{{ portainer_service_user }}"
+      mode: '0600'
+
+  - name: Deploy Portainer docker compose stack
+    community.docker.docker_compose_v2:
+      project_src: "{{ portainer_home_directory }}"
+      files:
+        - docker-compose.yml
+
+  become: true

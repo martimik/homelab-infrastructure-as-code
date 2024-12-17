@@ -1,0 +1,25 @@
+- block:
+  - name: Create group for service users
+    group:
+      name: "{{ service_group }}"
+      state: present
+
+  - name: Add remote user to services -group
+    user:
+      name: "{{ remote_user }}"
+      groups: "{{ service_group }}"
+      append: yes
+      state: present
+
+  - name: Create authorized keys for remote user
+    copy:
+      dest: /home/{{ remote_user }}/.ssh/authorized_keys
+      content: |
+        {% for key in authorized_keys %}
+        {{ key }}
+        {% endfor %}
+      owner: remote-user
+      group: remote-user
+      mode: '0600'
+
+  become: true

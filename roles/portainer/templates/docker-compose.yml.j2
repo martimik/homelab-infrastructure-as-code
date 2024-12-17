@@ -1,0 +1,24 @@
+services:
+  portainer:
+    image: portainer/portainer-ce:latest
+    container_name: portainer
+    ports:
+      - "9000:9000"
+    command: "--admin-password '{{ portainer_admin_password_hash }}'"
+    volumes:
+      - "{{ portainer_home_directory }}/data:/data"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - "proxy"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.portainer.rule=Host(`portainer.{{ domain_name }}`)"
+      - "traefik.http.services.portainer.loadbalancer.server.port=9000"
+      - "traefik.http.routers.portainer.entrypoints=websecure"
+      - "traefik.http.routers.portainer.tls=true"
+    restart: "unless-stopped"
+
+networks:
+  proxy:
+    name: proxy
+    external: true

@@ -1,0 +1,96 @@
+# Create self-signed ssl-certificate
+- block:
+  - name: Create ssl certificate directory
+    file:
+      path: "{{ certificate_directory }}"
+      state: directory
+
+  # Generate private key and certificate signing request
+  - name: Check if private key exists
+    stat:
+      path: "{{ certificate_directory }}/{{ private_key_filename }}"
+    register: private_key_state
+
+  - name: Create the private key for the server SSL certificate
+    community.crypto.openssl_privatekey:
+      path: "{{ certificate_directory }}/{{ private_key_filename }}"
+      size: 2048
+      cipher: auto
+      # passphrase: "{{ certificate_key_passphrase }}"
+      owner: root
+    when:
+      not private_key_state.stat.exists
+
+  - name: Check if certificate signing request exists
+    stat:
+      path: "{{ certificate_directory }}/{{ certificate_signing_request_filename }}"
+    register: certificate_signing_request_state
+
+  - name: Create a certificate signing request (CSR) for the server
+    community.crypto.openssl_csr:
+      path: "{{ certificate_directory }}/{{ certificate_signing_request_filename }}"
+      privatekey_path: "{{ certificate_directory }}/{{ private_key_filename }}"
+      # privatekey_passphrase: "{{ certificate_key_passphrase }}"
+      common_name: "{{ domain_name }}"
+      subject_alt_name: "DNS:{{ domain_name }},IP:{{ ansible_default_ipv4.address }}"
+    when:
+     not certificate_signing_request_state.stat.exists
+
+  # Generate a self-signed Root CA
+  - name: Check if root ca private key exists
+    stat:
+      path: "{{ certificate_directory }}/{{ root_ca_private_key_filename }}"
+    register: root_ca_key_state
+
+  - name: Create the private key for the CA
+    community.crypto.openssl_privatekey:
+      path: "{{ certificate_directory }}/{{ root_ca_private_key_filename }}"
+      size: 2048
+      cipher: auto
+      passphrase: "{{ root_ca_private_key_passphrase }}"
+      owner: root
+    when:
+      not root_ca_key_state.stat.exists
+
+  - name: Check if root ca exists
+    stat:
+      path: "{{ certificate_directory }}/{{ root_ca_certificate_filename }}"
+    register: root_ca_key_state
+
+  - name: Create the self-signed Root CA certificate
+    community.crypto.x509_certificate:
+      path: "{{ certificate_directory }}/{{ root_ca_certificate_filename }}"
+      privatekey_path: "{{ certificate_directory }}/{{ root_ca_private_key_filename }}"
+      privatekey_passphrase: "{{ root_ca_private_key_passphrase }}"
+      csr_path: "{{ certificate_directory }}/{{ certificate_signing_request_filename }}"
+      provider: selfsigned
+    when:
+      not root_ca_key_state.stat.exists
+
+  - name: Check if self-signed certificate exists
+    stat:
+      path: "{{ certificate_directory }}/{{ certificate_filename }}"
+    register: certificate_state
+
+  - name: Sign the server's certificate with the CA
+    community.crypto.x509_certificate:
+      path: "{{ certificate_directory }}/{{ certificate_filename }}"
+      privatekey_path: "{{ certificate_directory }}/{{ private_key_filename }}"
+      # privatekey_passphrase: "{{ certificate_key_passphrase }}"
+      csr_path: "{{ certificate_directory }}/{{ certificate_signing_request_filename }}"
+      provider: ownca
+      ownca_path: "{{ certificate_directory }}/{{ root_ca_certificate_filename }}"
+      ownca_privatekey_path: "{{ certificate_directory }}/{{ root_ca_private_key_filename }}"
+      ownca_privatekey_passphrase: "{{ root_ca_private_key_passphrase }}"
+    when:
+      not certificate_state.stat.exists
+
+  # Give ownership of created files to root
+  - name: Change ownership of directory recursively
+    file:
+      path: "{{ certificate_directory }}"
+      owner: root
+      mode: "0600"
+      recurse: yes
+
+  become: true

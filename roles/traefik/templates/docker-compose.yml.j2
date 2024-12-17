@@ -1,0 +1,45 @@
+services:
+  traefik:
+    image: traefik:v3.1
+    container_name: traefik
+    restart: unless-stopped
+    command:
+      - "--providers.docker=true"
+      - "--accesslog=true"
+    security_opt:
+      - "no-new-privileges:true"
+    networks:
+      - "proxy"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "{{ traefik_cert_directory }}:/certs"
+      - "{{ traefik_home_directory }}/{{ traefik_config_file }}:/etc/traefik/traefik.yml"
+      - "{{ traefik_home_directory }}/{{ traefik_ssl_config_filename }}:/etc/traefik/{{ traefik_ssl_config_filename }}"
+    labels:
+      - "traefik.enable=true"
+
+      # HTTP and HTTPS entryPoints
+      - "traefik.http.routers.traefik.entrypoints=web"
+      - "traefik.http.routers.traefik-secure.entrypoints=websecure"
+      - "traefik.http.routers.traefik-secure.tls=true"
+
+      # API Router
+      - "traefik.http.routers.api.rule=Host(`www.{{ domain_name }}`)"
+      - "traefik.http.routers.api.service=api@internal"
+
+      # Dashboard settings
+      - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.{{ domain_name }}`)"
+      - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
+      - "traefik.http.routers.traefik-dashboard.tls=true"
+      - "traefik.http.routers.traefik-dashboard.service=api@internal"
+      - "traefik.http.routers.traefik-dashboard.middlewares=basic-auth"
+
+      # Basic Auth Middleware with admin user
+      - "traefik.http.middlewares.basic-auth.basicauth.users=admin:{{ traefik_dashboard_admin_password_hash }}"
+
+networks:
+  proxy:
+    name: proxy

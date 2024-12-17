@@ -1,0 +1,42 @@
+- name: Gather Docker container details
+  community.docker.docker_container_info:
+    name: traefik
+  register: container_info
+  become: true
+
+- name: Extract container IP address
+  set_fact:
+    reverse_proxy_ip: "{{ container_info.container.NetworkSettings.Networks.proxy.IPAddress }}"
+
+- block:
+    - name: Add service user for Home assistant
+      user:
+        name: "{{ homeassistant_service_user }}"
+        groups: "{{ service_group }}"
+        state: present
+
+    - name: Copy configuration file
+      template:
+        src: ../templates/configuration.yaml.j2
+        dest: "{{ homeassistant_home_directory }}/config/{{ homeassistant_configuration_filename }}"
+        owner: "{{ homeassistant_service_user }}"
+        group: "{{ homeassistant_service_user }}"
+        mode: '0600'
+      vars:
+        reverse_proxy_ip: "{{ reverse_proxy_ip }}"
+
+    - name: Copy Home assistant docker compose file
+      template:
+        src: ../templates/docker-compose.yml.j2
+        dest: "{{ homeassistant_home_directory }}/docker-compose.yml"
+        owner: "{{ homeassistant_service_user }}"
+        group: "{{ homeassistant_service_user }}"
+        mode: '0600'
+
+    - name: Deploy Home assistant docker compose stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ homeassistant_home_directory }}"
+        files:
+          - docker-compose.yml
+
+  become: true

@@ -1,0 +1,42 @@
+- name: Gather package facts
+  package_facts:
+    manager: apt
+  no_log: true
+
+# Install required packages
+- block:
+  - name: Ensure APT is updated
+    apt:
+      update_cache: yes
+
+  - name: Add Docker GPG key
+    ansible.builtin.apt_key:
+      url: https://download.docker.com/linux/debian/gpg
+      state: present
+
+  - name: Add Docker APT repository
+    ansible.builtin.apt_repository:
+      repo: "deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_lsb.codename }} stable"
+      state: present
+
+  - name: Update APT cache after adding Docker repo
+    apt:
+      update_cache: yes
+
+  - name: Install latest Docker Engine
+    apt:
+      name: docker-ce
+      state: latest
+
+  - name: Install latest docker compose (CLI plugin)
+    apt:
+      name: docker-compose-plugin
+      state: latest
+
+  - name: Start and enable Docker service
+    systemd:
+      name: docker
+      enabled: yes
+      state: started
+
+  become: true

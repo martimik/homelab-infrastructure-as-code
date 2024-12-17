@@ -1,0 +1,76 @@
+# Ansible
+ansible_user: remote-user
+remote_user: remote-user
+
+# Server
+homelab_ip_address: 192.168.1.10
+domain_name: home.arpa
+
+# Router
+router_ip_address: 192.168.1.1
+router_domain_name: "router.{{ domain_name }}"
+
+pihole_dns_servers: 9.9.9.9;149.112.112.112
+
+# Dropbear / Remote crypto unlock
+dropbear_server_ip: 192.168.1.100
+dropbear_gateway: "{{ router_ip_address }}"
+dropbear_netmask: 255.255.255.0
+dropbear_hostname: homelab
+
+# SSL
+certificate_directory: /etc/ssl/homelab
+
+private_key_filename: private.key
+certificate_filename: self-signed.crt
+
+certificate_signing_request_filename: home-arpa.csr
+root_ca_private_key_filename: root-ca.key
+root_ca_certificate_filename: root-ca.crt
+
+# Groups
+service_group: services
+
+# Traefik
+traefik_service_user: traefik
+
+traefik_home_directory: "/home/{{ traefik_service_user }}"
+traefik_cert_directory: "/home/{{ traefik_service_user }}/certs"
+
+traefik_config_file: traefik.yml
+traefik_ssl_config_filename: ssl-config.yml
+
+# Pi-hole
+pihole_service_user: pi-hole
+
+pihole_home_directory: "/home/{{ pihole_service_user }}"
+pihole_etc_directory: "/home/{{ pihole_service_user }}/etc-pihole"
+pihole_dnsmasq_directory: "/home/{{ pihole_service_user }}/etc-dnsmasq.d"
+
+# Postgresql
+postgres_service_user: postgres
+postgres_home_directory: "/home/{{ postgres_service_user }}"
+
+# Portainer
+portainer_service_user: portainer
+portainer_home_directory: "/home/{{ portainer_service_user }}"
+
+# Home assistant
+homeassistant_service_user: home-assistant
+homeassistant_home_directory: "/home/{{ homeassistant_service_user }}"
+
+homeassistant_configuration_filename: configuration.yaml
+
+# Nextcloud
+nextcloud_service_user: nextcloud
+nextcloud_home_directory: "/home/{{ nextcloud_service_user }}"
+
+# Gitea
+gitea_service_user: gitea
+gitea_home_directory: "/home/{{ gitea_service_user }}"
+
+# GitLab
+gitlab_service_user: gitlab
+gitlab_home_directory: "/home/{{ gitlab_service_user }}"
+
+gitlab_root_email: mikko.martikainen@proton.me

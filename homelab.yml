@@ -1,0 +1,15 @@
+- hosts: homelab
+  vars_files:
+    - group_vars/secrets.yml
+
+  roles:
+  - { role: system, tags: ["system"] }
+  - { role: common, tags: ["common"] }
+  - { role: dropbear, tags: ["dropbear"] }
+  - { role: ssl, tags: ["ssl"] }
+  - { role: traefik, tags: ["traefik"] }
+  - { role: pi-hole, tags: ["pihole"] }
+  - { role: portainer, tags: ["portainer"] }
+  - { role: homeassistant, tags: ["homeassistant"] }
+  - { role: nextcloud, tags: ["nextcloud"] }
+  - { role: gitea, tags: ["gitea"]}

@@ -1,0 +1,54 @@
+services:
+
+  # NextCloud service
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    restart: unless-stopped
+    networks:
+      - nextcloud-internal
+      - proxy
+    environment:
+      - "POSTGRES_HOST=nextcloud-database"
+      - "POSTGRES_DB=nextcloud"
+      - "POSTGRES_USER=nextcloud"
+      - "POSTGRES_PASSWORD={{ nextcloud_database_password }}"
+      - "NEXTCLOUD_TRUSTED_DOMAINS=next.{{ domain_name }}"
+      - "OVERWRITEHOST=next.{{ domain_name }}"
+      - "OVERWRITECLIURL=https://next.{{ domain_name }}"
+      - "OVERWRITEPROTOCOL=https"
+      - "TRUSTED_PROXIES={{ reverse_proxy_ip }}"
+      - "APACHE_DISABLE_REWRITE_IP=1"
+      - "NEXTCLOUD_ADMIN_USER=admin"
+      - "NEXTCLOUD_ADMIN_PASSWORD={{ nextcloud_admin_password }}"
+    volumes:
+      - "{{ nextcloud_home_directory }}/data:/var/www/html"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.rule=Host(`next.{{ domain_name }}`)"
+      - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
+      - "traefik.http.routers.nextcloud.entrypoints=websecure"
+      - "traefik.http.routers.nextcloud.tls=true"
+    depends_on:
+      - nextcloud-database
+
+  # Database
+  nextcloud-database:
+    image: postgres:16
+    container_name: nextcloud-database
+    restart: unless-stopped
+    networks:
+      - nextcloud-internal
+    environment:
+      - "POSTGRES_DB=nextcloud"
+      - "POSTGRES_USER=nextcloud"
+      - "POSTGRES_PASSWORD={{ nextcloud_database_password }}"
+    volumes:
+      - "{{ nextcloud_home_directory }}/postgres:/var/lib/postgresql/data"
+
+networks:
+  proxy:
+    name: proxy
+    external: true
+  nextcloud-internal:
+    name: nextcloud-internal

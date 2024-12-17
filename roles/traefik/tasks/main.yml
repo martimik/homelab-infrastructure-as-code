@@ -1,0 +1,66 @@
+- block:
+  - name: Add service user for traefik
+    user:
+      name: "{{ traefik_service_user }}"
+      groups: "{{ service_group }}"
+      state: present
+    become: true
+
+  - name: Create directory for certificate
+    file:
+      path: "{{ traefik_cert_directory }}"
+      owner: "{{ traefik_service_user }}"
+      group: "{{ traefik_service_user }}"
+      mode: '0600'
+      state: directory
+
+  # Copy certificate files so traefik can use them
+  - name: Copy certificate file and set permissions
+    copy:
+      remote_src: true
+      src: "{{ certificate_directory }}/{{ certificate_filename }}"
+      dest: "{{ traefik_cert_directory }}/{{ certificate_filename }}"
+      owner: "{{ traefik_service_user }}"
+      group: "{{ traefik_service_user }}"
+      mode: '0600'
+
+  - name: Copy certificate key file and set permissions
+    copy:
+      remote_src: true
+      src: "{{ certificate_directory }}/{{ private_key_filename }}"
+      dest: "{{ traefik_cert_directory }}/{{ private_key_filename }}"
+      owner: "{{ traefik_service_user }}"
+      group: "{{ traefik_service_user }}"
+      mode: '0600'
+
+  - name: Copy traefik config file
+    template:
+      src: ../templates/traefik.yml.j2
+      dest: "{{ traefik_home_directory }}/{{ traefik_config_file }}"
+      owner: "{{ traefik_service_user }}"
+      group: "{{ traefik_service_user }}"
+      mode: '0600'
+
+  - name: Copy traefik ssl-config file
+    template:
+      src: ../templates/ssl-config.yml.j2
+      dest: "{{ traefik_home_directory }}/{{ traefik_ssl_config_filename }}"
+      owner: "{{ traefik_service_user }}"
+      group: "{{ traefik_service_user }}"
+      mode: '0600'
+
+  - name: Copy docker compose file
+    template:
+      src: ../templates/docker-compose.yml.j2
+      dest: "{{ traefik_home_directory }}/docker-compose.yml"
+      owner: "{{ traefik_service_user }}"
+      group: "{{ traefik_service_user }}"
+      mode: '0600'
+
+  - name: Deploy docker compose stack
+    community.docker.docker_compose_v2:
+      project_src: "{{ traefik_home_directory }}"
+      files:
+        - docker-compose.yml
+
+  become: true
