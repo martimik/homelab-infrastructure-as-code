@@ -2,11 +2,11 @@
 
 ## Bare metal linux installation on the target machine
 
-OS: Debian 12 (at the time) headless
+OS: Debian headless
 
 ### Full disk encryption
 
-It's called personal computer (pc)
+It's called a pc (personal computer)
 
 ### Sudo user
 
