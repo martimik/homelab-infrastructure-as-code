@@ -1,4 +1,4 @@
-# Homelab provisioning with Ansible
+# Provisioning home server with Ansible
 
 ## System setup
 
@@ -6,12 +6,11 @@ Read [system setup](system-setup.md) readme for instructions.
 
 ## Ansible configuration
 
-### Install ansible galaxy collections on deploying machine
+### Install ansible galaxy collections to the machine you are using to run the ansible tasks
 
 ```
 ansible-galaxy collection install docker
 ```
-
 
 ### Add deployment hosts file
 
@@ -20,6 +19,10 @@ Copy `hosts.template` as `hosts` and update the following line on with the serve
 ```
 server_1         ansible_host=<server-ip-address>
 ```
+
+### Add deployment variables
+
+Change deployment variables in `/group_vars/homelab.yml` according to your network and system setup.
 
 ### Add deployment secrets
 
@@ -48,4 +51,16 @@ Run specific role to host
 
 ```bash
 ./deploy.sh <role>
+```
+
+## SSH
+
+After running Ansible tasks you can use ssh to open the server encryption remotely after reboot with
+```
+ssh root@<dropbear_server_ip>
+```
+
+Afterwards you can normally ssh to the server  
+```
+ssh <remote-user>@<homelab-ip>
 ```

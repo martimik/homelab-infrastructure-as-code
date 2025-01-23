@@ -4,7 +4,7 @@
       name: "{{ service_group }}"
       state: present
 
-  - name: Add remote user to services -group
+  - name: Add remote user to services-group
     user:
       name: "{{ remote_user }}"
       groups: "{{ service_group }}"
