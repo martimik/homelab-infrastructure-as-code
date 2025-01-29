@@ -1,3 +1,11 @@
+- name: Set service username variable
+  set_fact:
+    nextcloud_service_user: "{{ role_name }}"
+
+- name: Set service user home folder variable
+  set_fact:
+    nextcloud_home_directory: "/home/{{ nextcloud_service_user }}"
+
 - name: Gather Docker container details
   community.docker.docker_container_info:
     name: traefik
@@ -23,6 +31,7 @@
         group: "{{ nextcloud_service_user }}"
         mode: 0600
       vars:
+        nextcloud_home_directory: "{{ nextcloud_home_directory }}"
         reverse_proxy_ip: "{{ reverse_proxy_ip }}"
 
     - name: Deploy docker compose stack

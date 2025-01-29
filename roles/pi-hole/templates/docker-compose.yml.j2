@@ -14,7 +14,7 @@ services:
       PIHOLE_DNS_: "{{ pihole_dns_servers }}"
       DNS_FQDN_REQUIRED: "true"
     volumes:
-      - "{{ pihole_etc_directory }}:/etc/pihole"
+      - "{{ pihole_home_directory }}/etc-pihole:/etc/pihole"
       - "{{ pihole_dnsmasq_directory }}:/etc/dnsmasq.d"
     labels:
       - "traefik.enable=true"

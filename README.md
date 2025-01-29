@@ -1,4 +1,27 @@
-# Provisioning home server with Ansible
+# **Provisioning Infrastructure for Self-Hosting Services with Ansible**
+
+## **Easily Deploy & Manage Services in Docker Containers**
+
+This project provides an automated deployment of a scalable infrastructure for self-hosting services on a home server using Docker Containers.  
+It simplifies adding new services by leveraging **Traefik** as a reverse proxy, dynamically routing incoming network traffic based on subdomains to the corresponding Docker container. Self-signed SSL certificates are used to ensure secure communication within a local network.
+With this setup, services are easily deployed and managed with Docker, providing a flexible and efficient foundation for self-hosting on a home server.
+
+### **Included Services**
+
+- **Traefik** - A reverse proxy to route network traffic to docker containers
+- **Portainer** – Manage Docker containers via a web UI
+- **Nextcloud** – File sharing and cloud services
+- **Gitea** – Self-hosted Git server with a web UI
+- **Pi-hole** – DNS server for managing custom domains and ad-blocking
+- **Dropbear** – Remote unlocking of server disk encryption
+
+After deployment, the services can be accessed through the following domains (when using home.arpa as the main domain):
+
+- **Traefik:** `traefik.home.arpa`
+- **Portainer:** `portainer.home.arpa`
+- **Nextcloud:** `next.home.arpa`
+- **Gitea:** `gitea.home.arpa`
+- **Pi-hole:** `pihole.home.arpa`
 
 ## System setup
 
@@ -28,16 +51,7 @@ Change deployment variables in `/group_vars/homelab.yml` according to your netwo
 
 Copy `secrets.template.yml` as `secrets.yml` and fill the values.
 
-* Password variables ending in `_hash` need to be in hash format (check below). 
 * `authorized_keys` should contain an array even if there is only one public key that needs to be added.
-
-### Generating password hashes 
-
-Some passwords in secrets.yml file are in hash format and passwords hashed need to be generated with
-
-```
-./generate-password-hash.sh <username> <password>
-```
 
 ## Running Ansible tasks
 
@@ -47,7 +61,7 @@ Run all tasks defined in homelab playbook to host defined in hosts file
 ./deploy.sh
 ```
 
-Run specific role to host
+Run a specific role
 
 ```bash
 ./deploy.sh <role>

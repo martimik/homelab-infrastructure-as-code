@@ -1,6 +1,8 @@
 # Ansible
 ansible_user: remote-user
-remote_user: remote-user
+
+# Users
+server_remote_user: remote-user
 
 # Server
 homelab_ip_address: 192.168.1.10
@@ -31,46 +33,10 @@ root_ca_certificate_filename: root-ca.crt
 # Groups
 service_group: services
 
+### Services ###
+
 # Traefik
-traefik_service_user: traefik
-
-traefik_home_directory: "/home/{{ traefik_service_user }}"
-traefik_cert_directory: "/home/{{ traefik_service_user }}/certs"
-
-traefik_config_file: traefik.yml
-traefik_ssl_config_filename: ssl-config.yml
-
-# Pi-hole
-pihole_service_user: pi-hole
-
-pihole_home_directory: "/home/{{ pihole_service_user }}"
-pihole_etc_directory: "/home/{{ pihole_service_user }}/etc-pihole"
-pihole_dnsmasq_directory: "/home/{{ pihole_service_user }}/etc-dnsmasq.d"
-
-# Postgresql
-postgres_service_user: postgres
-postgres_home_directory: "/home/{{ postgres_service_user }}"
+traefik_admin_user: admin
 
 # Portainer
-portainer_service_user: portainer
-portainer_home_directory: "/home/{{ portainer_service_user }}"
-
-# Home assistant
-homeassistant_service_user: home-assistant
-homeassistant_home_directory: "/home/{{ homeassistant_service_user }}"
-
-homeassistant_configuration_filename: configuration.yaml
-
-# Nextcloud
-nextcloud_service_user: nextcloud
-nextcloud_home_directory: "/home/{{ nextcloud_service_user }}"
-
-# Gitea
-gitea_service_user: gitea
-gitea_home_directory: "/home/{{ gitea_service_user }}"
-
-# GitLab
-gitlab_service_user: gitlab
-gitlab_home_directory: "/home/{{ gitlab_service_user }}"
-
-gitlab_root_email: mikko.martikainen@proton.me
+portainer_admin_user: admin

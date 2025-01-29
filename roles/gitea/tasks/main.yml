@@ -1,3 +1,11 @@
+- name: Set service username variable
+  set_fact:
+    gitea_service_user: "{{ role_name }}"
+
+- name: Set service user home folder variable
+  set_fact:
+    gitea_home_directory: "/home/{{ gitea_service_user }}"
+
 - block:
     - name: Add service user for Gitea
       user:

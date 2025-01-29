@@ -16,8 +16,8 @@ services:
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "{{ traefik_cert_directory }}:/certs"
-      - "{{ traefik_home_directory }}/{{ traefik_config_file }}:/etc/traefik/traefik.yml"
-      - "{{ traefik_home_directory }}/{{ traefik_ssl_config_filename }}:/etc/traefik/{{ traefik_ssl_config_filename }}"
+      - "{{ traefik_config_file_path }}:/etc/traefik/traefik.yml"
+      - "{{ traefik_ssl_config_file_path }}:/etc/traefik/ssl-config.yml"
     labels:
       - "traefik.enable=true"
 
@@ -38,7 +38,7 @@ services:
       - "traefik.http.routers.traefik-dashboard.middlewares=basic-auth"
 
       # Basic Auth Middleware with admin user
-      - "traefik.http.middlewares.basic-auth.basicauth.users=admin:{{ traefik_dashboard_admin_password_hash }}"
+      - "traefik.http.middlewares.basic-auth.basicauth.users={{ traefik_admin_basic_auth_credentials }}"
 
 networks:
   proxy:

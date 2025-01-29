@@ -16,7 +16,6 @@
       path: "{{ certificate_directory }}/{{ private_key_filename }}"
       size: 2048
       cipher: auto
-      # passphrase: "{{ certificate_key_passphrase }}"
       owner: root
     when:
       not private_key_state.stat.exists
@@ -30,7 +29,6 @@
     community.crypto.openssl_csr:
       path: "{{ certificate_directory }}/{{ certificate_signing_request_filename }}"
       privatekey_path: "{{ certificate_directory }}/{{ private_key_filename }}"
-      # privatekey_passphrase: "{{ certificate_key_passphrase }}"
       common_name: "{{ domain_name }}"
       subject_alt_name: "DNS:{{ domain_name }},IP:{{ ansible_default_ipv4.address }}"
     when:
@@ -76,7 +74,6 @@
     community.crypto.x509_certificate:
       path: "{{ certificate_directory }}/{{ certificate_filename }}"
       privatekey_path: "{{ certificate_directory }}/{{ private_key_filename }}"
-      # privatekey_passphrase: "{{ certificate_key_passphrase }}"
       csr_path: "{{ certificate_directory }}/{{ certificate_signing_request_filename }}"
       provider: ownca
       ownca_path: "{{ certificate_directory }}/{{ root_ca_certificate_filename }}"

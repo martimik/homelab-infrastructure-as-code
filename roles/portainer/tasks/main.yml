@@ -1,3 +1,17 @@
+- name: Set service-user variable to the current role name
+  set_fact:
+    portainer_service_user: "{{ role_name }}"
+
+- name: Set service-home-folder variable using service-user
+  set_fact:
+    portainer_home_directory: "/home/{{ portainer_service_user }}"
+
+- name: Generate portainer admin password hash using htpasswd
+  shell: "htpasswd -nbB '{{ portainer_admin_user }}' '{{ portainer_admin_password }}' | cut -d ':' -f 2 | sed 's/\\$/\\$\\$/g'"
+  register: htpasswd_gen
+  changed_when: false
+  no_log: true
+
 - block:
   - name: Add service user for portainer
     user:
@@ -12,6 +26,9 @@
       owner: "{{ portainer_service_user }}"
       group: "{{ portainer_service_user }}"
       mode: '0600'
+    vars:
+      portainer_home_directory: "{{ portainer_home_directory }}"
+      portainer_admin_password_hash: "{{ htpasswd_gen.stdout }}"
 
   - name: Deploy Portainer docker compose stack
     community.docker.docker_compose_v2:

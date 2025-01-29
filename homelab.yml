@@ -8,8 +8,8 @@
   - { role: dropbear, tags: ["dropbear"] }
   - { role: ssl, tags: ["ssl"] }
   - { role: traefik, tags: ["traefik"] }
-  - { role: pi-hole, tags: ["pihole"] }
+  - { role: pi-hole, tags: ["pi-hole"] }
   - { role: portainer, tags: ["portainer"] }
-  - { role: homeassistant, tags: ["homeassistant"] }
+  - { role: home-assistant, tags: ["home-assistant"] }
   - { role: nextcloud, tags: ["nextcloud"] }
   - { role: gitea, tags: ["gitea"]}

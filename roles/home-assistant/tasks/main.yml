@@ -1,3 +1,11 @@
+- name: Set service username variable
+  set_fact:
+    homeassistant_service_user: "{{ role_name }}"
+
+- name: Set service user home folder variable
+  set_fact:
+    homeassistant_home_directory: "/home/{{ homeassistant_service_user }}"
+
 - name: Gather Docker container details
   community.docker.docker_container_info:
     name: traefik
@@ -18,7 +26,7 @@
     - name: Copy configuration file
       template:
         src: ../templates/configuration.yaml.j2
-        dest: "{{ homeassistant_home_directory }}/config/{{ homeassistant_configuration_filename }}"
+        dest: "{{ homeassistant_home_directory }}/config/configuration.yaml"
         owner: "{{ homeassistant_service_user }}"
         group: "{{ homeassistant_service_user }}"
         mode: '0600'
@@ -32,6 +40,8 @@
         owner: "{{ homeassistant_service_user }}"
         group: "{{ homeassistant_service_user }}"
         mode: '0600'
+      vars:
+        homeassistant_home_directory: "{{ homeassistant_home_directory }}"
 
     - name: Deploy Home assistant docker compose stack
       community.docker.docker_compose_v2:

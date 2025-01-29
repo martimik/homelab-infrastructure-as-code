@@ -1,3 +1,29 @@
+- name: Set service username variable
+  set_fact:
+    traefik_service_user: "{{ role_name }}"
+
+- name: Set service user home folder variable
+  set_fact:
+    traefik_home_directory: "/home/{{ traefik_service_user }}"
+
+- name: Set certificate folder variable
+  set_fact:
+    traefik_cert_directory: "{{ traefik_home_directory }}/certs"
+
+- name: Set traefik configuration file path variable
+  set_fact:
+    traefik_config_file_path: "{{ traefik_home_directory }}/traefik.yml"
+
+- name: Set traefik ssl-configuration file path variable
+  set_fact:
+    traefik_ssl_config_file_path: "{{ traefik_home_directory }}/ssl-config.yml"
+
+- name: Generate Traefik admin password hash using htpasswd
+  shell: "htpasswd -nbB '{{ traefik_admin_user }}' '{{ traefik_dashboard_admin_password }}' | sed 's/\\$/\\$\\$/g'"
+  register: htpasswd_gen
+  changed_when: false
+  no_log: true
+
 - block:
   - name: Add service user for traefik
     user:
@@ -36,7 +62,7 @@
   - name: Copy traefik config file
     template:
       src: ../templates/traefik.yml.j2
-      dest: "{{ traefik_home_directory }}/{{ traefik_config_file }}"
+      dest: "{{ traefik_config_file_path }}"
       owner: "{{ traefik_service_user }}"
       group: "{{ traefik_service_user }}"
       mode: '0600'
@@ -44,7 +70,7 @@
   - name: Copy traefik ssl-config file
     template:
       src: ../templates/ssl-config.yml.j2
-      dest: "{{ traefik_home_directory }}/{{ traefik_ssl_config_filename }}"
+      dest: "{{ traefik_ssl_config_file_path }}"
       owner: "{{ traefik_service_user }}"
       group: "{{ traefik_service_user }}"
       mode: '0600'
@@ -56,6 +82,11 @@
       owner: "{{ traefik_service_user }}"
       group: "{{ traefik_service_user }}"
       mode: '0600'
+    vars:
+      traefik_cert_directory: "{{ traefik_cert_directory }}"
+      traefik_config_file_path: "{{ traefik_config_file_path }}"
+      traefik_ssl_config_file_path: "{{ traefik_ssl_config_file_path }}"
+      traefik_admin_basic_auth_credentials: "{{ htpasswd_gen.stdout }}"
 
   - name: Deploy docker compose stack
     community.docker.docker_compose_v2:

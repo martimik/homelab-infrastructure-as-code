@@ -2,7 +2,7 @@
 
 ## Bare metal linux installation on the target machine
 
-OS: Debian (headless)
+OS: Debian (12)
 
 ### Full disk encryption
 

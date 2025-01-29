@@ -1,3 +1,15 @@
+- name: Set service username variable
+  set_fact:
+    pihole_service_user: "{{ role_name }}"
+
+- name: Set service user home folder variable
+  set_fact:
+    pihole_home_directory: "/home/{{ pihole_service_user }}"
+
+- name: Set pi-hole dnsmasq folder variable
+  set_fact:
+    pihole_dnsmasq_directory: "{{ pihole_home_directory }}/etc-dnsmasq.d"
+
 - block:
   - name: Add service user for pihole
     user:
@@ -20,6 +32,10 @@
       owner: "{{ pihole_service_user }}"
       group: "{{ pihole_service_user }}"
       mode: '0600'
+    vars:
+      pihole_home_directory: "{{ pihole_home_directory }}"
+      pihole_dnsmasq_directory: "{{ pihole_dnsmasq_directory }}"
+
 
   - name: Deploy Pi-hole docker compose stack
     community.docker.docker_compose_v2:
