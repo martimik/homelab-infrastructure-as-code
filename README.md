@@ -23,6 +23,10 @@ After deployment, the services can be accessed through the following domains (wh
 - **Gitea:** `gitea.home.arpa`
 - **Pi-hole:** `pihole.home.arpa`
 
+### Infrastructure diagram
+
+![infrastructure-image](local_network.png)
+    
 ## System setup
 
 Read [system setup](system-setup.md) readme for instructions.
