@@ -10,6 +10,7 @@
   - { role: traefik, tags: ["traefik"] }
   - { role: pi-hole, tags: ["pi-hole"] }
   - { role: portainer, tags: ["portainer"] }
-  - { role: home-assistant, tags: ["home-assistant"] }
+# - { role: home-assistant, tags: ["home-assistant"] }
   - { role: nextcloud, tags: ["nextcloud"] }
   - { role: gitea, tags: ["gitea"]}
+  - { role: cleanup, tags: ["cleanup"]}

@@ -1,0 +1,8 @@
+
+- block:
+  - name: Remove all unused Docker images
+    ansible.builtin.shell: docker image prune -a -f
+    args:
+      warn: false
+
+  become: true
