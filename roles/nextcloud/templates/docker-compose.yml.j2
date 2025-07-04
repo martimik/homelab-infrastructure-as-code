@@ -1,7 +1,7 @@
 services:
   # NextCloud service
   nextcloud:
-    image: nextcloud:latest
+    image: "nextcloud:{{ nextcloud_docker_image_version }}"
     container_name: nextcloud
     restart: unless-stopped
     networks:

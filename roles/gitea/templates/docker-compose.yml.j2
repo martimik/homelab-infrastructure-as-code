@@ -2,7 +2,7 @@ services:
 
   # Gitea service
   server:
-    image: gitea/gitea:latest
+    image: "gitea/gitea:{{ gitea_docker_image_version }}"
     container_name: gitea
     restart: unless-stopped
     networks:

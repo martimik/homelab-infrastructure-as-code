@@ -1,6 +1,6 @@
 services:
   portainer:
-    image: portainer/portainer-ce:latest
+    image: "portainer/portainer-ce:{{ portainer_docker_image_version }}"
     container_name: portainer
     ports:
       - "9000:9000"
