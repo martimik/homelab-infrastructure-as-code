@@ -2,13 +2,13 @@
 
 ## Bare metal linux installation on the target machine
 
-OS: Debian (12)
+OS: Debian (current version: 12)
 
 ### Full disk encryption
 
-It's called pc (personal computer)
+It's called a pc (personal computer)
 
-### Sudo user
+### Remote user
 
 Username: remote-user
 
@@ -16,7 +16,7 @@ Username: remote-user
 
 ### Static IP
 
-Configure a static ip for the target machine if inside local network, so ansible can be reliably deployed.
+If the machine you’re deploying to is on your local network, give it a fixed IP address so Ansible can always find it reliably.
 
 ## Pre-deployment tasks
 
@@ -29,5 +29,5 @@ sudo apt update & apt upgrade
 ### Install Ansible
 
 ```bash
-sudo apt install docker docker-compose ansible
+sudo apt install ansible
 ```
