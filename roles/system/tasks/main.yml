@@ -4,6 +4,24 @@
       name: "{{ service_group }}"
       state: present
 
+  - name: Create group for media services
+    group:
+      name: "{{ media_group }}"
+      state: present
+
+  - name: Set ownership of media folder
+    file:
+      path: "{{ media_directory }}"
+      owner: root
+      group: "{{ media_group }}"
+      recurse: yes
+
+  - name: Set permissions on media folder
+    file:
+      path: "{{ media_directory }}"
+      mode: "2775"
+      recurse: yes
+
   - name: Add remote user to services-group
     user:
       name: "{{ server_remote_user }}"

@@ -1,0 +1,46 @@
+version: "3.8"
+
+services:
+  jellyfin:
+    image: "jellyfin/jellyfin:{{ jellyfin_docker_image_version }}"
+    container_name: jellyfin
+
+    shm_size: "2gb"
+
+    # Needed for VAAPI hardware acceleration
+    devices:
+      - /dev/dri:/dev/dri
+
+    environment:
+      - TZ=Europe/Helsinki
+
+    user: "{{ jellyfin_service_user_uid }}:{{ jellyfin_service_user_gid }}"
+
+    volumes:
+      - "{{ jellyfin_home_directory }}/config:/config"
+      - "{{ jellyfin_home_directory }}/cache:/cache"
+      - "{{ media_directory }}:/media"
+
+    networks:
+      - proxy
+
+    restart: unless-stopped
+
+    labels:
+      - "traefik.enable=true"
+
+      # Router
+      - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.{{ domain_name }}`)"
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      -
+      # Service
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+
+      # Optional: WebSocket / streaming stability
+      - "traefik.http.middlewares.jellyfin-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.routers.jellyfin.middlewares=jellyfin-headers"
+
+networks:
+  proxy:
+    name: proxy
+    external: true

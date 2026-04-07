@@ -1,0 +1,44 @@
+- name: Set service username variable
+  set_fact:
+    jellyfin_service_user: "{{ role_name }}"
+
+- name: Set service user home folder variable
+  set_fact:
+    jellyfin_home_directory: "/home/{{ jellyfin_service_user }}"
+
+- block:
+    - name: Add service user for Jellyfin
+      user:
+        name: "{{ jellyfin_service_user }}"
+        groups:
+        - "{{ service_group }}"
+        - "{{ media_group }}"
+        - video
+        - render
+        state: present
+
+    - name: Get Jellyfin user info
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ jellyfin_service_user }}"
+
+    - name: Set Jellyfin service user UID and GID facts
+      set_fact:
+        jellyfin_service_user_uid: "{{ ansible_facts.getent_passwd[jellyfin_service_user][1] }}"
+        jellyfin_service_user_gid: "{{ ansible_facts.getent_passwd[jellyfin_service_user][2] }}"
+
+    - name: Copy docker compose file
+      template:
+        src: ../templates/docker-compose.yml.j2
+        dest: "{{ jellyfin_home_directory }}/docker-compose.yml"
+        owner: "{{ jellyfin_service_user }}"
+        group: "{{ jellyfin_service_user }}"
+        mode: 0600
+
+    - name: Deploy docker compose stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ jellyfin_home_directory }}"
+        files:
+          - docker-compose.yml
+
+  become: true

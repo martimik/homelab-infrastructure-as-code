@@ -32,6 +32,11 @@ root_ca_certificate_filename: root-ca.crt
 
 # Groups
 service_group: services
+media_group: media
+
+# Directories
+
+media_directory: /srv/media
 
 ### Services ###
 
