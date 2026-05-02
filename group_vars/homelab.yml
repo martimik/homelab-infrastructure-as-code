@@ -15,7 +15,7 @@ router_domain_name: "router.{{ domain_name }}"
 pihole_dns_servers: 9.9.9.9;149.112.112.112
 
 # Dropbear / Remote crypto unlock
-dropbear_server_ip: 192.168.1.100
+dropbear_server_ip: 192.168.1.11
 dropbear_gateway: "{{ router_ip_address }}"
 dropbear_netmask: 255.255.255.0
 dropbear_hostname: homelab
