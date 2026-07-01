@@ -13,27 +13,22 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    environment:
+      - "CF_DNS_API_TOKEN={{cf_dns_api_token}}"
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "{{ traefik_cert_directory }}:/certs"
       - "{{ traefik_config_file_path }}:/etc/traefik/traefik.yml"
-      - "{{ traefik_ssl_config_file_path }}:/etc/traefik/ssl-config.yml"
+      - "{{ traefik_letsencrypt_directory }}:/letsencrypt"
     labels:
       - "traefik.enable=true"
-
-      # HTTP and HTTPS entryPoints
-      - "traefik.http.routers.traefik.entrypoints=web"
-      - "traefik.http.routers.traefik-secure.entrypoints=websecure"
-      - "traefik.http.routers.traefik-secure.tls=true"
-
-      # API Router
-      - "traefik.http.routers.api.rule=Host(`www.{{ domain_name }}`)"
-      - "traefik.http.routers.api.service=api@internal"
 
       # Dashboard settings
       - "traefik.http.routers.traefik-dashboard.rule=Host(`traefik.{{ domain_name }}`)"
       - "traefik.http.routers.traefik-dashboard.entrypoints=websecure"
       - "traefik.http.routers.traefik-dashboard.tls=true"
+      - "traefik.http.routers.traefik-dashboard.tls.domains[0].main={{ domain_name }}"
+      - "traefik.http.routers.traefik-dashboard.tls.domains[0].sans=*.{{ domain_name }}"
+      - "traefik.http.routers.traefik-dashboard.tls.certresolver=cloudflare"
       - "traefik.http.routers.traefik-dashboard.service=api@internal"
       - "traefik.http.routers.traefik-dashboard.middlewares=basic-auth"
 

@@ -21,9 +21,14 @@ providers:
     exposedByDefault: false
     network: proxy
     watch: true
-  file:
-    filename: /etc/traefik/ssl-config.yml
-    watch: true
+
+certificatesResolvers:
+  cloudflare:
+    acme:
+      email: {{ cf_dns_email }}
+      storage: /letsencrypt/acme.json
+      dnsChallenge:
+        provider: cloudflare
 
 log:
   filePath: "/var/log/traefik.log"

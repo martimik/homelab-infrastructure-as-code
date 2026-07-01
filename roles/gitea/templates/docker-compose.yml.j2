@@ -1,5 +1,4 @@
 services:
-
   # Gitea service
   server:
     image: "gitea/gitea:{{ gitea_docker_image_version }}"
@@ -25,9 +24,9 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.gitea.rule=Host(`gitea.{{ domain_name }}`)"
-      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
       - "traefik.http.routers.gitea.entrypoints=websecure"
       - "traefik.http.routers.gitea.tls=true"
+      - "traefik.http.services.gitea.loadbalancer.server.port=3000"
     depends_on:
       - gitea-database
 

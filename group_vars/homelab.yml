@@ -6,7 +6,6 @@ server_remote_user: remote-user
 
 # Server
 homelab_ip_address: 192.168.1.10
-domain_name: home.arpa
 
 # Router
 router_ip_address: 192.168.1.1
@@ -20,9 +19,10 @@ dropbear_gateway: "{{ router_ip_address }}"
 dropbear_netmask: 255.255.255.0
 dropbear_hostname: homelab
 
-# SSL
-certificate_directory: /etc/ssl/homelab
+# SSL - Self signed certificates
+use_self_signed_certificates: false
 
+certificate_directory: /etc/ssl/homelab
 private_key_filename: private.key
 certificate_filename: self-signed.crt
 
