@@ -6,7 +6,7 @@
   set_fact:
     pihole_home_directory: "/home/{{ pihole_service_user }}"
 
-- name: Set pi-hole dnsmasq folder variable
+- name: Set pihole dnsmasq folder variable
   set_fact:
     pihole_dnsmasq_directory: "{{ pihole_home_directory }}/etc-dnsmasq.d"
 
@@ -25,7 +25,7 @@
       group: "{{ pihole_service_user }}"
       mode: '0644'
 
-  - name: Copy Pi-hole docker compose file
+  - name: Copy Pihole docker compose file
     template:
       src: ../templates/docker-compose.yml.j2
       dest: "{{ pihole_home_directory }}/docker-compose.yml"
@@ -35,7 +35,6 @@
     vars:
       pihole_home_directory: "{{ pihole_home_directory }}"
       pihole_dnsmasq_directory: "{{ pihole_dnsmasq_directory }}"
-
 
   - name: Deploy Pi-hole docker compose stack
     community.docker.docker_compose_v2:
