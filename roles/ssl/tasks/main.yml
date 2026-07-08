@@ -1,0 +1,2 @@
+- include_tasks: generate_certificates.yml
+  when: use_self_signed_certificates

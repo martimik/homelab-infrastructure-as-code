@@ -1,0 +1,62 @@
+- name: Set service username variable
+  set_fact:
+    gluetun_service_user: "gluetun"
+
+- name: Set service user home folder variable
+  set_fact:
+    qbit_home_directory: "/home/{{ gluetun_service_user }}"
+
+- name: Set service username variable
+  set_fact:
+    qbit_service_user: "{{ role_name }}"
+
+- name: Set service user home folder variable
+  set_fact:
+    qbit_home_directory: "/home/{{ qbit_service_user }}"
+
+- block:
+    - name: Add service user for Gluetun
+      user:
+        name: "{{ gluetun_service_user }}"
+        groups:
+          - "{{ service_group }}"
+        state: present
+
+    - name: Add service user for qBit
+      user:
+        name: "{{ qbit_service_user }}"
+        groups:
+          - "{{ service_group }}"
+          - "{{ media_group }}"
+        state: present
+
+    - name: Get qBit user info
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ qbit_service_user }}"
+
+    - name: Get media group info
+      ansible.builtin.getent:
+        database: group
+        key: "{{ media_group }}"
+
+    - name: Set qBit service user UID and GID facts
+      set_fact:
+        qbit_service_user_uid: "{{ ansible_facts.getent_passwd[qbit_service_user][1] }}"
+        media_group_gid: "{{ ansible_facts.getent_group[media_group][1] }}"
+
+    - name: Copy docker compose file
+      template:
+        src: ../templates/docker-compose.yml.j2
+        dest: "{{ qbit_home_directory }}/docker-compose.yml"
+        owner: "{{ qbit_service_user }}"
+        group: "{{ qbit_service_user }}"
+        mode: 0600
+
+    - name: Deploy docker compose stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ qbit_home_directory }}"
+        files:
+          - docker-compose.yml
+
+  become: true

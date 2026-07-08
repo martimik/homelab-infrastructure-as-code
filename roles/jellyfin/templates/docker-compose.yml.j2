@@ -1,44 +1,34 @@
-version: "3.8"
-
 services:
   jellyfin:
-    image: "jellyfin/jellyfin:{{ jellyfin_docker_image_version }}"
     container_name: jellyfin
-
-    shm_size: "2gb"
-
+    image: jellyfin/jellyfin:latest
+    user: "{{ jellyfin_service_user_uid }}:{{ media_group_gid }}"
+    restart: unless-stopped
+    networks:
+      - proxy
     # Needed for VAAPI hardware acceleration
     devices:
       - /dev/dri:/dev/dri
-
+    shm_size: "2gb"
     environment:
+      - "JELLYFIN_PublishedServerUrl=https://jellyfin.{{ domain_name }}"
       - TZ=Europe/Helsinki
-
-    user: "{{ jellyfin_service_user_uid }}:{{ jellyfin_service_user_gid }}"
-
     volumes:
       - "{{ jellyfin_home_directory }}/config:/config"
       - "{{ jellyfin_home_directory }}/cache:/cache"
       - "{{ media_directory }}:/media"
-
-    networks:
-      - proxy
-
-    restart: unless-stopped
-
     labels:
-      - "traefik.enable=true"
-
       # Router
+      - "traefik.enable=true"
       - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.{{ domain_name }}`)"
       - "traefik.http.routers.jellyfin.entrypoints=websecure"
-      -
-      # Service
+      - "traefik.http.routers.jellyfin.tls=true"
       - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
 
       # Optional: WebSocket / streaming stability
       - "traefik.http.middlewares.jellyfin-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
       - "traefik.http.routers.jellyfin.middlewares=jellyfin-headers"
+      - "traefik.docker.network=proxy"
 
 networks:
   proxy:

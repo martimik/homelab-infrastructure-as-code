@@ -16,6 +16,18 @@
       group: "{{ media_group }}"
       recurse: yes
 
+  - name: Create media subfolders
+    file:
+      path: "{{ item }}"
+      state: directory
+      owner: root
+      group: "{{ media_group }}"
+    loop:
+      - "{{ media_download_directory }}"
+      - "{{ media_directory }}/movies"
+      - "{{ media_directory }}/series"
+      - "{{ media_directory }}/music"
+
   - name: Set permissions on media folder
     file:
       path: "{{ media_directory }}"
@@ -25,7 +37,9 @@
   - name: Add remote user to services-group
     user:
       name: "{{ server_remote_user }}"
-      groups: "{{ service_group }}"
+      groups:
+        - "{{ service_group }}"
+        - "{{ media_group }}"
       append: yes
       state: present
 

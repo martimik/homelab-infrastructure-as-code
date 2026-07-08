@@ -1,0 +1,48 @@
+- name: Set service username variable
+  set_fact:
+    servarr_service_user: "{{ role_name }}"
+
+- name: Set service user home folder variable
+  set_fact:
+    servarr_home_directory: "/home/{{ servarr_service_user }}"
+
+- block:
+    - name: Add service user for Servarr
+      user:
+        name: "{{ servarr_service_user }}"
+        groups:
+        - "{{ service_group }}"
+        - "{{ media_group }}"
+        state: present
+
+    - name: Get Servarr user info
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ servarr_service_user }}"
+
+    - name: Get media group info
+      ansible.builtin.getent:
+        database: group
+        key: "{{ media_group }}"
+
+    - name: Set Servarr service user UID and GID facts
+      set_fact:
+        servarr_service_user_uid: "{{ ansible_facts.getent_passwd[servarr_service_user][1] }}"
+        servarr_service_user_gid: "{{ ansible_facts.getent_group[media_group][1] }}"
+        media_group_gid: "{{ ansible_facts.getent_group[media_group][1] }}"
+
+    - name: Copy docker compose file
+      template:
+        src: ../templates/docker-compose.yml.j2
+        dest: "{{ servarr_home_directory }}/docker-compose.yml"
+        owner: "{{ servarr_service_user }}"
+        group: "{{ servarr_service_user }}"
+        mode: 0600
+
+    - name: Deploy docker compose stack
+      community.docker.docker_compose_v2:
+        project_src: "{{ servarr_home_directory }}"
+        files:
+          - docker-compose.yml
+
+  become: true

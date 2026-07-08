@@ -7,12 +7,6 @@ server_remote_user: remote-user
 # Server
 homelab_ip_address: 192.168.1.10
 
-# Router
-router_ip_address: 192.168.1.1
-router_domain_name: "router.{{ domain_name }}"
-
-pihole_dns_servers: 9.9.9.9;149.112.112.112
-
 # Dropbear / Remote crypto unlock
 dropbear_server_ip: 192.168.1.11
 dropbear_gateway: "{{ router_ip_address }}"
@@ -37,8 +31,12 @@ media_group: media
 # Directories
 
 media_directory: /srv/media
+media_download_directory: /srv/media/downloads
 
 ### Services ###
+
+# Pihole
+pihole_dns_servers: 9.9.9.9;149.112.112.112
 
 # Traefik
 traefik_admin_user: admin

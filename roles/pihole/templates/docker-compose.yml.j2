@@ -1,7 +1,7 @@
 services:
   pihole:
     container_name: pihole
-    image: "pihole/pihole:{{ pihole_docker_image_version }}"
+    image: pihole/pihole:latest
     restart: unless-stopped
     networks:
       - proxy

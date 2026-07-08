@@ -1,0 +1,87 @@
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    networks:
+      - proxy
+    environment:
+      - "PUID={{ servarr_service_user_uid }}"
+      - "PGID={{ servarr_service_user_gid }}"
+      - TZ=Europe/Helsinki
+    volumes:
+      - "{{ servarr_home_directory }}/prowlarr/config:/config"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prowlarr.rule=Host(`indexer.{{ domain_name }}`)"
+      - "traefik.http.routers.prowlarr.entrypoints=websecure"
+      - "traefik.http.routers.prowlarr.tls=true"
+      - "traefik.http.services.prowlarr.loadbalancer.server.port=9696"
+
+  radarr:
+    container_name: radarr
+    image: lscr.io/linuxserver/radarr:latest
+    restart: unless-stopped
+    networks:
+      - proxy
+    environment:
+      - "PUID={{ servarr_service_user_uid }}"
+      - "PGID={{ media_group_gid }}"
+      - TZ=Europe/Helsinki
+    volumes:
+      - "{{ servarr_home_directory }}/radarr/config:/config"
+      - "{{ media_directory }}:/media"
+      - "{{ media_download_directory }}:/downloads"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.rule=Host(`movies.{{ domain_name }}`)"
+      - "traefik.http.routers.radarr.entrypoints=websecure"
+      - "traefik.http.routers.radarr.tls=true"
+      - "traefik.http.services.radarr.loadbalancer.server.port=7878"
+
+  sonarr:
+    container_name: sonarr
+    image: lscr.io/linuxserver/sonarr:latest
+    restart: unless-stopped
+    networks:
+      - proxy
+    environment:
+      - "PUID={{ servarr_service_user_uid }}"
+      - "PGID={{ media_group_gid }}"
+      - TZ=Europe/Helsinki
+    volumes:
+      - "{{ servarr_home_directory }}/sonarr/config:/config"
+      - "{{ media_directory }}:/media"
+      - "{{ media_download_directory }}:/downloads"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.rule=Host(`tv.{{ domain_name }}`)"
+      - "traefik.http.routers.sonarr.entrypoints=websecure"
+      - "traefik.http.routers.sonarr.tls=true"
+      - "traefik.http.services.sonarr.loadbalancer.server.port=8989"
+
+  bazarr:
+    container_name: bazarr
+    image: lscr.io/linuxserver/bazarr:latest
+    restart: unless-stopped
+    networks:
+      - proxy
+    environment:
+      - "PUID={{ servarr_service_user_uid }}"
+      - "PGID={{ media_group_gid }}"
+      - TZ=Europe/Helsinki
+    volumes:
+      - "{{ servarr_home_directory }}/bazarr/config:/config"
+      - "{{ media_directory }}:/media"
+      - "{{ media_download_directory }}:/downloads"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bazarr.rule=Host(`subtitles.{{ domain_name }}`)"
+      - "traefik.http.routers.bazarr.entrypoints=websecure"
+      - "traefik.http.routers.bazarr.tls=true"
+      - "traefik.http.services.bazarr.loadbalancer.server.port=6767"
+
+networks:
+  proxy:
+    name: proxy
+    external: true

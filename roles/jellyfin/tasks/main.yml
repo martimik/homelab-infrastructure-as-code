@@ -22,10 +22,26 @@
         database: passwd
         key: "{{ jellyfin_service_user }}"
 
+    - name: Get media group info
+      ansible.builtin.getent:
+        database: group
+        key: "{{ media_group }}"
+
     - name: Set Jellyfin service user UID and GID facts
       set_fact:
         jellyfin_service_user_uid: "{{ ansible_facts.getent_passwd[jellyfin_service_user][1] }}"
-        jellyfin_service_user_gid: "{{ ansible_facts.getent_passwd[jellyfin_service_user][2] }}"
+        media_group_gid: "{{ ansible_facts.getent_group[media_group][1] }}"
+
+    - name: Create Jellyfin directories
+      file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ jellyfin_service_user }}"
+        group: "{{ jellyfin_service_user }}"
+        mode: "0755"
+      loop:
+        - "{{ jellyfin_home_directory }}/config"
+        - "{{ jellyfin_home_directory }}/cache"
 
     - name: Copy docker compose file
       template:
