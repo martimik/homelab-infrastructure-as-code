@@ -25,7 +25,15 @@ server.
 
 Note: The included Ansible playbooks are designed to work with Debian-based servers, using apt for package management.
 
-### **Current Services**
+### Domain / SSL
+
+The playbook supports two domain/SSL configurations:
+
+1. **Public domain** – Traefik automatically obtains and renews Let's Encrypt TLS certificates using Cloudflare's DNS-01 challenge. This requires your domain to be managed by Cloudflare.
+
+2. **Local domain** (e.g. `home.arpa`) – The playbook generates and configures self-signed TLS certificates for internal use, where publicly trusted certificates are not available.
+
+### **Services**
 
 - **Traefik** - A reverse proxy to route network traffic to docker containers
 - **Portainer** – Manage Docker containers via web UI
@@ -33,6 +41,9 @@ Note: The included Ansible playbooks are designed to work with Debian-based serv
 - **Gitea** – Self-hosted Git server with web UI
 - **Pi-hole** – DNS server for managing custom domains and ad-blocking
 - **Dropbear** – Remote unlocking of server disk encryption
+- **Jellyfin** - Media server used to stream content to clients
+- **qBittorrent** - qBittorrent client for downloading Linux iso's
+- **Servarr** - Multiple Servarr services, including Radarr, Sonarr, Prowlarr, Bazarr
 
 After deployment, the services can be accessed through the following domains (when using home.arpa as the main domain):
 
@@ -41,6 +52,12 @@ After deployment, the services can be accessed through the following domains (wh
 - **Nextcloud:** `next.home.arpa`
 - **Gitea:** `gitea.home.arpa`
 - **Pi-hole:** `pihole.home.arpa`
+- **qBit:** `qbit.home.arpa`
+- **Jellyfin:** `jellyfin.home.arpa`
+- **Radarr:** `movies.home.arpa`
+- **Sonarr:** `tv.home.arpa`
+- **Bazarr:** `subtitles.home.arpa`
+- **Prowlarr:** `indexer.home.arpa`
 
 ### Infrastructure diagram
 
